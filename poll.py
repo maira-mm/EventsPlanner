@@ -10,12 +10,12 @@ class Poll():
 
     #def build(self):
 
-def main(page):
+def main(page: Page):
     def button_clicked(e):
-        t.value = f"Your poll result is:{cg.value}"
+        t.value = f"Your poll result is: {e.control.value}"
         page.update()
     t = ft.Text()
-    b = ft.ElevatedButton(text="Confirm", on_click=button_clicked)
+    #g = ft.ElevatedButton(text="Go Back", on_click=#go back to chatbox)
         #input like a to-do list
         #have a confirm button (so it can be sent
         #have the percentage be the num of people in group
@@ -24,7 +24,7 @@ def main(page):
     cg = ft.RadioGroup(content=ft.Column([
         ft.Radio(value="1", label="1"),
         ft.Radio(value="2", label="2")
-        ]))
+        ]), on_change=button_clicked)
 
     page.add(ft.Text(f"Hi, choose"), cg, t)
 
