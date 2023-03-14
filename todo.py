@@ -3,13 +3,19 @@ from flet import (Checkbox, Column, FloatingActionButton, IconButton, Page, Row,
 
 
 class Task(UserControl):
-    def __init__(self, task_name, task_delete):
+    def __init__(self, task_name, task_delete, task_status_change):
         super().__init__()
         self.task_name = task_name
         self.task_delete = task_delete
+        self.task_status_change = task_status_change
+        self.completed = False
 
     def build(self):
-        self.display_task = Checkbox(value=False, label=self.task_name)
+        self.display_task = Checkbox(
+            value=False,
+            label=self.task_name,
+            on_change=self.status_changed
+        )
         self.edit_name = TextField(expand=1)
 
         self.display_view = Row(
@@ -63,6 +69,10 @@ class Task(UserControl):
         self.edit_view.visible = False
         self.update()
 
+    def status_changed(self, e):
+        self.completed = self.display_task.value
+        self.task_status_change(self)
+
     def delete_clicked(self, e):
         self.task_delete(self)
 
@@ -71,6 +81,12 @@ class Todo(UserControl):
     def build(self):
         self.new_task = TextField(hint_text="What would you like to get done?", expand=True)
         self.tasks = Column()
+##
+        self.filter = ft.Tabs(
+            selected_index=0,
+            on_change=self.tabs_changed,
+            tabs=[ft.Tab(text="all"), ft.Tab(text="active"), ft.Tab(text="completed")],
+        )
 
         return Column(
             width=600,
@@ -81,18 +97,43 @@ class Todo(UserControl):
                         FloatingActionButton(icon=icons.ADD, on_click=self.add_clicked),
                     ],
                 ),
-                self.tasks,
+                Column(
+                    spacing=25,
+                    controls=[
+                        self.filter,
+                        self.tasks,
+
+                    ],
+                ),
             ],
         )
 
     def add_clicked(self, e):
-        task = Task(self.new_task.value, self.task_delete)
-        self.tasks.controls.append(task)
-        self.new_task.value = ""
+        if self.new_task.value:
+            task = Task(self.new_task.value, self.task_status_change, self.task_delete)
+            self.tasks.controls.append(task)
+            self.new_task.value = ""
+            self.new_task.focus()
+            self.update()
+
+    def task_status_change(self, task):
         self.update()
 
     def task_delete(self, task):
         self.tasks.controls.remove(task)
+        self.update()
+
+    def update(self):
+        status = self.filter.tabs[self.filter.selected_index].text
+        for task in self.tasks.controls:
+            task.visible = (
+                status == "all"
+                or (status == "active" and task.completed == False)
+                or (status == "completed" and task.completed == True)
+            )
+        super().update()
+
+    def tabs_changed(self, e):
         self.update()
 
 
