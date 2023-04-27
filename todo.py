@@ -71,7 +71,10 @@ class Task(UserControl):
 
     def status_changed(self, e):
         self.completed = self.display_task.value
+        self.display_task = Checkbox(value=True, on_change=Todo.update())
         self.task_status_change(self)
+        self.completed = True
+        self.update()
 
     def delete_clicked(self, e):
         self.task_delete(self)

@@ -25,7 +25,7 @@ class PollAdmin(UserControl):
         page.update()
 
         t = ft.Text()
-        g = ft.ElevatedButton(text="Go Back", on_click=button_clicked)
+        g = ft.ElevatedButton(text="Go Back", on_click=self.button_clicked)
 
         cg = ft.RadioGroup(content=ft.Column([
            ft.Radio(value="1", label="1"),
